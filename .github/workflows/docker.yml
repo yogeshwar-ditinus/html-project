@@ -1,0 +1,33 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build Docker Image
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/html_project:latest .
+
+    - name: Push Docker Image
+      run: |
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/html_project:latest
+
+    - name: Success Message
+      run: |
+        echo "✅ Docker image successfully built and pushed to DockerHub!"
+        echo "📦 Image: ${{ secrets.DOCKERHUB_USERNAME }}/html_project:latest"
+        echo "🌐 Run with: docker run -p 8080:80 ${{ secrets.DOCKERHUB_USERNAME }}/html_project:latest"
